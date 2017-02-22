@@ -17,7 +17,7 @@ def index(request):
       return render(request, 'runtracker/dashboard.html')
 
 def logIn(request):
-   username = request.POST['email']
+   username = request.POST['username']
    password = request.POST['password']
    #Try to authenticate user with given credentials
    user = authenticate(username=username, password=password)

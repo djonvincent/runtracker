@@ -4,16 +4,60 @@ from django.contrib.auth.models import User
 import datetime
 from django.test import Client
 
+class SignUpTestCase(TestCase):
+   def test_sign_up(self):
+      c = Client()
+      c.post('/signup/', {
+         'username': 'billybob@spam.com',
+         'password': '123456',
+         'password2': '123456',
+         'first_name': 'billy',
+         'last_name': 'bob',
+         'mass': '97.5'
+      })
+      user = User.objects.get(username="billybob@spam.com")
+      self.assertIsNotNone(user)
+      
+   def test_mismatching_passwords(self):
+      c = Client()
+      c.post('/signup/', {
+         'username': 'keenrunnerb@sports.com',
+         'password': '123456',
+         'password2': '123457',
+         'first_name': 'billy',
+         'last_name': 'bob',
+         'mass': '97.5'
+      })
+      with self.assertRaises(User.DoesNotExist):
+         User.objects.get(username="billybob@spam.com")
+   
+
+class LogInTestCase(TestCase):
+   def setUp(self):
+      user = User.objects.create(
+         username = "joebloggs@example.com",
+         password = "secret"
+      )
+      user.save()
+      
+   def test_login(self):
+      c = Client()
+      response = c.post('/login/', {
+         'username': 'joebloggs@example.com',
+         'password': 'secret'
+      })
+      self.assertEqual(response.status_code, 200)
+   
 class RunTestCase(TestCase):
    def setUp(self):
-      self.user = User.objects.create_user(
+      user = User.objects.create_user(
          username = "joebloggs@example.com",
          password = "secret",
          first_name = "Joe",
          last_name = "Bloggs",
       )
-      self.user.userinfo.mass = 75
-      self.user.save()
+      user.userinfo.mass = 75
+      user.save()
       
       c = Client()
       c.login(username="joebloggs@example.com", password="secret")
@@ -40,3 +84,4 @@ class RunTestCase(TestCase):
       observed = Run.objects.get(pk=1).calories
       observed = round(observed, 2)
       self.assertEqual(expected, observed)
+
