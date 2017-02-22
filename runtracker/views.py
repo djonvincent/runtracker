@@ -123,19 +123,26 @@ def getRunsSince(request):
          runJSON = serializers.serialize('json', runs, fields=('distance', 'duration', 'date', 'calories'))
          return HttpResponse(runJSON, content_type="text/json")
 
+#Function to return all runs between two specified dates
 @login_required
 def getRunsBetween(request):
    if request.method == "POST":
+      #Bind form to data
       form = GetRunsBetweenForm(request.POST)
       if form.is_valid():
          lowerDate = form.cleaned_data['lowerdate']
          upperDate = form.cleaned_data['upperdate']
+         #Get initial list of runs belonging to the user
          runs = Run.objects.filter(user=request.user)
+         #Filter out runs with date lower than lowerDate, if specified
          if lowerDate is not None:
             runs = runs.filter(date__gte = lowerDate)
+         #Filter out runs with date higher than upperDate, if specified
          if upperDate is not None:
             runs = runs.filter(date__lte = upperDate)
+         #Order runs by date
          runs = runs.order_by('date')
+         #Serialise list of runs as JSON and send
          runJSON = serializers.serialize('json', runs, fields=('distance', 'duration', 'date', 'calories'))
          return HttpResponse(runJSON, content_type="text/json")
    
