@@ -1,0 +1,17 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Runtracker - Sign Up</title>
+{% include "runtracker/head.html" %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.2/Chart.bundle.min.js"></script>
+</head>
+<body>
+   <form method="POST">
+      {% csrf_token %}
+      {{ form }}
+      <input type="submit" value="Sign Up!">
+   </form>
+</body>
+</html>

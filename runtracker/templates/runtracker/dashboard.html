@@ -1,0 +1,72 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Runtracker - Dashboard</title>
+{% include "runtracker/head.html" %}
+<link rel="stylesheet" href='{% static "runtracker/css/dashboard.css" %}'> 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.2/Chart.bundle.min.js"></script>
+<script src='{% static "runtracker/scripts/dashboard.js" %}'></script>
+{% csrf_token %}
+</head>
+<body>
+   Hi {{ user.first_name }}!
+   <a href="/logout">Log out</a>
+   <form >
+      <label>Variable</label>
+      <select id="y-variable">
+         <option value="pace">Pace</option>
+         <option value="speed">Speed</option>
+         <option value="distance">Distance</option>
+         <option value="time">Time</option>
+         <option value="calories">Calories</option>
+      </select>
+      <br>
+      <label for="timeFrame">Display from:</label>
+      <select name="timeFrame" id="timeFrameOption">
+         <option value="last-week">Last week</option>
+         <option value="last-month">Last month</option>
+         <option value="last-year" selected>Last year</option>
+      </select><br>
+      <label>Custom range</label>
+      <input id="customRangeBox" type="checkbox"></input>
+      <label>Lower Date</label>
+      <input id="lowerDate" name="lowerDate" type="date" disabled></input>
+      <label>Upper Date</label>
+      <input id="upperDate" name="upperDate" type="date" disabled></input>
+      <input id="getRunsButton" type="button" value="Apply" disabled></input>
+   </form>
+   <div id="chart-container">
+      <canvas id="chart"></canvas>
+   </div>
+   <div id="summary">
+      <p id="total"></p>
+      <p id="average"></p>
+      <p id="max"></p>
+      <p id="min"></p>
+   </div>
+   </div>
+   <form action="addrun" method="POST">
+      <label for="distance">Distance (km)</label>
+      <input type="number" id="distance" required min=0></input>
+      <label for="hours">Hours</label>
+      <input type="number" id="hours" min=0></input>
+      <label for="minutes">Minutes</label>
+      <input type="number" id="minutes" min=0></input>
+      <label for="seconds">Seconds</label>
+      <input type="number" id="seconds" min=0></input>
+      <label for="datetime">Date</label>
+      <input type="datetime-local" id="datetime" required></input>
+      <input id="addRunButton" type="button" value="Add Run"></input>
+   </form>
+   <table>
+      <tbody id="runList">
+      </tbody>
+   </table>
+   <input id="deleteRunsButton" type="button" value="Delete selected"></input>
+</body>
+
+</html>
+
+

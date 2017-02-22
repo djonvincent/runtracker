@@ -1,0 +1,17 @@
+*.egg-info
+*.pot
+*.py[co]
+.tox/
+db.sqlite3
+semantic.json
+__pycache__
+MANIFEST
+dist/
+docs/_build/
+docs/locale/
+node_modules/
+tests/coverage_html/
+tests/.coverage
+build/
+tests/report/
+semantic/

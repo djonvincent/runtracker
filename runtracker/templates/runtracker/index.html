@@ -1,0 +1,57 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+   
+<head>
+   {% include "runtracker/head.html" %}
+   <link rel="stylesheet" href='{% static "runtracker/css/login.css" %}'>
+   <script src='{% static "runtracker/scripts/login.js" %}'></script>
+</head>
+<body>
+   
+<div class="ui middle aligned center aligned grid">
+   <div class="column">
+      <h1 class="ui image header">
+         <img class="image" src='{% static "runtracker/images/Rlogo.png" %}'>
+         <div class="content">
+            Log-in to RunTracker
+         </div>
+      </h1>
+      {% if loginError %}
+      <div class="ui negative message">
+         <i class="close icon"></i>
+         You entered an incorrect e-mail address or password
+      </div>
+      {% endif %}
+      <form class="ui large form" method="POST" action="login">
+         {% csrf_token %}
+         <div class="ui stacked segment">
+            <div class="field">
+               <div class="ui left icon input">
+                  <i class="user icon"></i>
+                  <input type="email" name="email" placeholder="E-mail address">
+               </div>
+            </div>
+            <div class="field">
+               <div class="ui left icon input">
+                  <i class="lock icon"></i>
+                  <input type="password" name="password" placeholder="Password">
+               </div>
+            </div>
+            <div class="ui fluid large submit button">Login</div>
+         </div>
+         
+         <div class="ui error message"></div>
+         
+      </form>
+      
+      <div class="ui message">
+         New to RunTracker? <a href="signup">Sign up</a>
+      </div>
+   </div>
+</div>
+   
+</body>
+
+</html>
+         

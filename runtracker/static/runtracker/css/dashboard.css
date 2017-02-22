@@ -1,0 +1,13 @@
+#chart-container {
+   width: 900px;
+   height: 450px;
+}
+
+#summary {
+   font-weight: bold;
+   font-size: 2em;
+}
+
+#summary p {
+   margin: 0;
+}
