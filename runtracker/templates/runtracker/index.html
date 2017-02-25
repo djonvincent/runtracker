@@ -23,7 +23,7 @@
          You entered an incorrect e-mail address or password
       </div>
       {% endif %}
-      <form class="ui large form" method="POST" action="login">
+      <form class="ui large form" method="POST" action="/login/">
          {% csrf_token %}
          <div class="ui stacked segment">
             <div class="field">

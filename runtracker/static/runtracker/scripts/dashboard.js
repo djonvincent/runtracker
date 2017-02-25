@@ -62,7 +62,7 @@ $(document).ready(function(){
       
       //Submit form with AJAX post method, including the CSRF token
       $.post({
-         url: 'addrun',
+         url: '/addrun/',
          data: {
             'distance': distance,
             'duration': duration,
@@ -83,7 +83,7 @@ $(document).ready(function(){
       
       //Submit form with AJAX post method, including the CSRF token
       $.post({
-         url: 'getrunsbetween',
+         url: '/getrunsbetween/',
          data: {
             'lowerdate': lower,
             'upperdate': upper,
@@ -106,7 +106,7 @@ $(document).ready(function(){
       });
       
        $.post({
-         url: 'deleteruns',
+         url: '/deleteruns/',
          data: {
             'delete-run': selected,
             'csrfmiddlewaretoken': csrftoken
@@ -121,7 +121,7 @@ $(document).ready(function(){
    //Function to get data from specified time frame using AJAX
    function updateTimeFrame(timeFrame){
       $.post({
-         url: 'getrunssince',
+         url: '/getrunssince/',
          data: {
             'timeFrame': timeFrame,
             'csrfmiddlewaretoken': csrftoken
