@@ -1,13 +1,12 @@
 from django import forms
 from django.contrib.auth.models import User
-from django.utils.translation import ugettext_lazy as _
 
 #Create form used when adding a run to the database
 class AddRunForm(forms.Form):
    distance = forms.FloatField(min_value=0)
    duration = forms.FloatField(min_value=0)
    #Use the datetime widget for inputing the date
-   datetime = forms.DateTimeField(widget=forms.TextInput(attrs={'type': 'datetime-local'}), input_formats = ['%Y-%m-%dT%H:%M'])
+   datetime = forms.DateTimeField(input_formats = ['%Y-%m-%dT%H:%M'])
 
 #Form used when filtering runs by data
 class GetRunsBetweenForm(forms.Form):
@@ -40,5 +39,5 @@ class SignUpForm(forms.ModelForm):
       if password and password2:
          #Raise error if passwords don't match
          if password != password2:
-            raise forms.ValidationError(_("Passwords do not match."), code="invalid")
+            raise forms.ValidationError("Passwords do not match.", code="invalid")
             

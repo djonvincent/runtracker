@@ -9,7 +9,7 @@ from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 import datetime
 
 def index(request):
-   #Serve the login page is user is not logged in
+   #Serve the login page if user is not logged in
    if not request.user.is_authenticated():
       return render(request, 'runtracker/index.html')
    #Otherwise serve the dashboard
@@ -17,18 +17,19 @@ def index(request):
       return render(request, 'runtracker/dashboard.html')
 
 def logIn(request):
-   username = request.POST['username']
-   password = request.POST['password']
-   #Try to authenticate user with given credentials
-   user = authenticate(username=username, password=password)
-   #If credentials are invalid, return login page with error message
-   if user is None:
-      c = {'loginError': "True"}
-      return render(request, 'runtracker/index.html', c)
-   #Log user in if credentials are correct, return to dashboard page
-   else:
-      login(request, user)
-      return redirect('/')
+   if request.method == "POST":
+      username = request.POST['username']
+      password = request.POST['password']
+      #Try to authenticate user with given credentials
+      user = authenticate(username=username, password=password)
+      #If credentials are invalid, return login page with error message
+      if user is None:
+         c = {'loginError': "True"}
+         return render(request, 'runtracker/index.html', c)
+      #Log user in if credentials are correct, return to dashboard page
+      else:
+         login(request, user)
+         return redirect('/')
 
 #Logs the user out
 def logOut(request):

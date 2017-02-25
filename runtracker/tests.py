@@ -46,7 +46,8 @@ class LogInTestCase(TestCase):
          'username': 'joebloggs@example.com',
          'password': 'secret'
       })
-      self.assertEqual(response.status_code, 200)
+      user = User.objects.get(username="joebloggs@example.com")
+      self.assertTrue(user.is_authenticated())
    
 class RunTestCase(TestCase):
    def setUp(self):
