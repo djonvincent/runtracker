@@ -30,6 +30,7 @@ def logIn(request):
       else:
          login(request, user)
          return redirect('/')
+   return HttpResponse(status=400)
 
 #Logs the user out
 def logOut(request):
@@ -51,9 +52,11 @@ def signUp(request):
       if form.is_valid():
          username = form.cleaned_data['username']
          password = form.cleaned_data['password']
+         first_name = form.cleaned_data['first_name']
+         last_name = form.cleaned_data['last_name']
          mass = form.cleaned_data['mass']
          #Create new user object with given credentials
-         user = User.objects.create_user(username=username, password=password)
+         user = User.objects.create_user(username=username, password=password, first_name=first_name, last_name=last_name)
          #If a mass is specified, use that. Otherwise use default value (70)
          if mass is not None:
             user.userinfo.mass = mass
@@ -100,29 +103,24 @@ def deleteRun(request):
          Run.objects.get(pk=i).delete()
       #Return code 204, successfuly fulfilled request and no content to send
       return HttpResponse(status=204)
+   return HttpResponse(status=400)
 
-#Function to return all runs within a specified time frame
+#Function to return all runs within a specified number of days
 @login_required
 def getRunsSince(request):
    if request.method == "POST":
-      timeFrame = request.POST['timeFrame']
-      #Dictionary of how many days are in each time frame
-      timeFrames = {
-         'last-week': 7,
-         'last-month': 30,
-         'last-year': 365,
-      }
-      if timeFrame in timeFrames:
-         #Get the number of days in time frame
-         days = timeFrames[timeFrame]
+      days = request.POST['days']
+      if days.isdigit():
+         days = int(days)
          timeDelta = datetime.timedelta(days=days)
          #Find minimum date by subtracting days from today
          date = datetime.date.today() - timeDelta
-         #Get list of all run objects since minimum date
+         #Get list of all run objects since minimum date, ordered by date
          runs = Run.objects.filter(user=request.user, date__gte=date).order_by('date')
          #Serialise list of runs as JSON and send
          runJSON = serializers.serialize('json', runs, fields=('distance', 'duration', 'date', 'calories'))
          return HttpResponse(runJSON, content_type="text/json")
+   return HttpResponse(status=400)
 
 #Function to return all runs between two specified dates
 @login_required
@@ -133,17 +131,15 @@ def getRunsBetween(request):
       if form.is_valid():
          lowerDate = form.cleaned_data['lowerdate']
          upperDate = form.cleaned_data['upperdate']
-         #Get initial list of runs belonging to the user
-         runs = Run.objects.filter(user=request.user)
+         #Get initial list of runs belonging to the user, ordered by date
+         runs = Run.objects.filter(user=request.user).order_by('date')
          #Filter out runs with date lower than lowerDate, if specified
          if lowerDate is not None:
             runs = runs.filter(date__gte = lowerDate)
          #Filter out runs with date higher than upperDate, if specified
          if upperDate is not None:
             runs = runs.filter(date__lte = upperDate)
-         #Order runs by date
-         runs = runs.order_by('date')
          #Serialise list of runs as JSON and send
          runJSON = serializers.serialize('json', runs, fields=('distance', 'duration', 'date', 'calories'))
          return HttpResponse(runJSON, content_type="text/json")
-   
+   return HttpResponse(status=400)

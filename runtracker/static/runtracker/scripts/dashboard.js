@@ -2,12 +2,10 @@ $(document).ready(function(){
    var runData;
    //Initialise empty chart
    var chart = new Chart($('#chart'));
-   //Get the time frame to display data between
-   var timeFrame = $('#timeFrameOption').val();
    //Get token so we can submit forms with protection from CSRF
    var csrftoken = $("[name=csrfmiddlewaretoken]").val();
    //Get the data from the server to populate chart
-   updateTimeFrame(timeFrame);
+   updateTimeFrame();
    
    //Toggle between dropdown and custom time inputs
    $("#customRangeBox").change(function(){
@@ -18,8 +16,7 @@ $(document).ready(function(){
    
    //Update time frame when user selects option, then update chart
    $('#timeFrameOption').change(function(){
-      timeFrame = $(this).val();
-      updateTimeFrame(timeFrame);
+      updateTimeFrame();
    });
    
    //Change chart data when user changes the variable to display
@@ -49,10 +46,10 @@ $(document).ready(function(){
       //Calculate time in minutes
       duration = 60*hours + minutes + seconds/60;
       //Alert error messages for missing values
-      if (duration==0){
+      if (duration<=0){
          alert("Enter a time");
          return;
-      }else if (distance==0){
+      }else if (distance<=0){
          alert("Enter a distance");
          return;
       }else if(datetime==''){
@@ -71,29 +68,18 @@ $(document).ready(function(){
             },
          //Update chart once new data is received
          success: function(result){
-            updateTimeFrame(timeFrame);
+            if ($('#customRangeBox').prop('checked')){
+               updateCustomDates();
+            }else{
+               updateTimeFrame();
+            }
          }
       });
    });
    
    //Function to get runs from server whose dates lie between the lower and upper dates
    $('#getRunsButton').click(function(){
-      var lower = $('#lowerDate').val();
-      var upper = $('#upperDate').val();
-      
-      //Submit form with AJAX post method, including the CSRF token
-      $.post({
-         url: '/getrunsbetween/',
-         data: {
-            'lowerdate': lower,
-            'upperdate': upper,
-            'csrfmiddlewaretoken': csrftoken
-            },
-         //Update chart once new data is received
-         success: function(result){
-            updateChart(result);
-         }
-      });
+      updateCustomDates();
    });
    
    //Delete selected runs and update data when user clicks delete button
@@ -106,29 +92,59 @@ $(document).ready(function(){
       });
       
        $.post({
-         url: '/deleteruns/',
+         url: '/deleterun/',
          data: {
             'delete-run': selected,
             'csrfmiddlewaretoken': csrftoken
             },
          //Update chart with new data
          success: function(result){
-            updateTimeFrame(timeFrame);
+            if ($('#customRangeBox').prop('checked')){
+               updateCustomDates();
+            }else{
+               updateTimeFrame();
+            }
          }
       });
    });
    
    //Function to get data from specified time frame using AJAX
-   function updateTimeFrame(timeFrame){
+   function updateTimeFrame(){
+      var timeFrame = $('#timeFrameOption').val();
+      var days = {
+         'last-week': 7,
+         'last-month': 30,
+         'last-year': 365
+      };
       $.post({
          url: '/getrunssince/',
          data: {
-            'timeFrame': timeFrame,
+            'days': days[timeFrame],
             'csrfmiddlewaretoken': csrftoken
             },
             //Server responds with JSON of run data
          dataType: 'json',
          //Update chart with new data
+         success: function(result){
+            updateChart(result);
+         }
+      });
+   }
+   
+   //Function to get runs between custom dates using AJAX
+   function updateCustomDates(){
+      var lower = $('#lowerDate').val();
+      var upper = $('#upperDate').val();
+      
+      //Submit form with AJAX post method, including the CSRF token
+      $.post({
+         url: '/getrunsbetween/',
+         data: {
+            'lowerdate': lower,
+            'upperdate': upper,
+            'csrfmiddlewaretoken': csrftoken
+            },
+         //Update chart once new data is received
          success: function(result){
             updateChart(result);
          }

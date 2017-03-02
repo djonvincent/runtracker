@@ -3,6 +3,7 @@ from .models import Run
 from django.contrib.auth.models import User
 import datetime
 from django.test import Client
+import datetime
 
 class SignUpTestCase(TestCase):
    def test_sign_up(self):
@@ -60,15 +61,9 @@ class RunTestCase(TestCase):
       user.userinfo.mass = 75
       user.save()
       
-      c = Client()
-      c.login(username="joebloggs@example.com", password="secret")
-      
-      c.post('/addrun/', {
-         'distance': 12,
-         'duration': 46 + 32/60,
-         'datetime': '2017-02-08T12:00'
-      })
-      
+      date = datetime.datetime(year=2017, month=2, day=8, hour=12)
+      run = Run.objects.create(user=user, distance=12, duration=46+32/60, date=date)
+      run.save()
    
    def test_speed_calculation(self):
       expected = 15.47
@@ -79,10 +74,43 @@ class RunTestCase(TestCase):
       expected = 3.88
       observed = Run.objects.get(pk=1).pace
       self.assertEqual(expected, observed)
+
+class AddRunTestCase(TestCase):
+   def setUp(self):
+      user = User.objects.create_user(
+         username = "joebloggs@example.com",
+         password = "secret"
+      )
+      user.userinfo.mass = 75
+      user.save()
    
-   def test_calories_calculation(self):
-      expected = 961.08
-      observed = Run.objects.get(pk=1).calories
-      observed = round(observed, 2)
-      self.assertEqual(expected, observed)
+   def test_add_run(self):
+      c = Client()
+      c.login(username="joebloggs@example.com", password="secret")
+      c.post('/addrun/', {
+         'distance': 6,
+         'duration': 25,
+         'datetime': '2017-01-15T09:00'
+      })
+      self.assertIsNotNone(Run.objects.get(pk=1))
+
+class DeleteRunTestCase(TestCase):
+   def setUp(self):
+      user = User.objects.create_user(
+         username = "joebloggs@example.com",
+         password = "secret"
+      )
+      user.save()
+      
+      date = datetime.datetime(year=2016, month=11, day=4, hour=15)
+      run = Run.objects.create(user=user, distance=2.5, duration=12, date=date)
+      run.save()
+   
+   def test_delete_run(self):
+      c = Client()
+      c.login(username="joebloggs@example.com", password="secret")
+      c.post('/deleterun/', {
+         'delete-run[]': ['1']
+      })
+      self.assertEquals(len(Run.objects.all()), 0)
 
